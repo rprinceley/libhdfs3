@@ -27,10 +27,27 @@ LIST(APPEND libhdfs3_SOURCES ${files})
 AUTO_SOURCES(files "*.h" "RECURSE" "${CMAKE_CURRENT_SOURCE_DIR}")
 LIST(APPEND libhdfs3_SOURCES ${files})
 
-AUTO_SOURCES(libhdfs3_PROTO_FILES "proto/*.proto" "RECURSE" "${CMAKE_CURRENT_SOURCE_DIR}")
-SET(libhdfs3_PROTO_FILES ${libhdfs3_PROTO_FILES} PARENT_SCOPE)
+set(PROTO_INPUT_PATH ${CMAKE_SOURCE_DIR}/src/proto)
+set(PROTO_OUTPUT_PATH ${CMAKE_CURRENT_BINARY_DIR}/generated)
+INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR}/generated)
 
-PROTOBUF_GENERATE_CPP(libhdfs3_PROTO_SOURCES libhdfs3_PROTO_HEADERS ${libhdfs3_PROTO_FILES})
+set(libhdfs3_PROTO_FILES "ClientDatanodeProtocol.proto;ClientNamenodeProtocol.proto;IpcConnectionContext.proto;ProtobufRpcEngine.proto;RpcHeader.proto;Security.proto;datatransfer.proto;hdfs.proto")
+foreach(proto_file ${libhdfs3_PROTO_FILES})
+    get_filename_component(bcos_proto_abs "${PROTO_INPUT_PATH}" ABSOLUTE)
+    set(proto_file_abs ${bcos_proto_abs}/${proto_file})
+    get_filename_component(rel_dir ${proto_file} DIRECTORY)
+    get_filename_component(basename ${proto_file} NAME_WE)
+    set(generated_files ${PROTO_OUTPUT_PATH}/${basename}.pb.cc)
+
+    list(APPEND PROTO_SRCS ${generated_files})
+    message("Command: protoc --cpp_out ${PROTO_OUTPUT_PATH} -I ${PROTO_INPUT_PATH} ${proto_file}")
+    add_custom_command(
+        OUTPUT ${generated_files}
+        COMMAND protobuf::protoc --cpp_out ${PROTO_OUTPUT_PATH} -I ${PROTO_INPUT_PATH} ${proto_file}
+        COMMENT "Generating ${generated_files} from ${proto_file_abs}"
+        VERBATIM
+    )
+endforeach()
 
 SET(HEADER 
     client/BlockLocation.h
@@ -45,8 +62,8 @@ SET(HEADER
     common/Exception.h
     common/XmlConfig.h)
 
-ADD_LIBRARY(libhdfs3-static STATIC ${libhdfs3_SOURCES} ${libhdfs3_PROTO_SOURCES} ${libhdfs3_PROTO_HEADERS})
-ADD_LIBRARY(libhdfs3-shared SHARED ${libhdfs3_SOURCES} ${libhdfs3_PROTO_SOURCES} ${libhdfs3_PROTO_HEADERS})
+ADD_LIBRARY(libhdfs3-static STATIC ${libhdfs3_SOURCES} ${libhdfs3_PROTO_SOURCES} ${PROTO_SRCS})
+ADD_LIBRARY(libhdfs3-shared SHARED ${libhdfs3_SOURCES} ${libhdfs3_PROTO_SOURCES} ${PROTO_SRCS})
 
 ADD_CUSTOM_COMMAND(
     TARGET libhdfs3-shared libhdfs3-static
