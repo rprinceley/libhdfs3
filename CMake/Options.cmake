@@ -19,7 +19,7 @@ ELSE(ENABLE_DEBUG STREQUAL ON)
         STRING "Choose the type of build, options are: None Debug Release RelWithDebInfo MinSizeRel." FORCE)
 ENDIF(ENABLE_DEBUG STREQUAL ON)
 
-SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-strict-aliasing")
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC -fno-strict-aliasing")
 SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fno-strict-aliasing")
 
 IF(ENABLE_COVERAGE STREQUAL ON)
@@ -167,3 +167,8 @@ TRY_COMPILE(HAVE_STD_ATOMIC
     ${CMAKE_BINARY_DIR}/test.cpp 
     CMAKE_FLAGS "-DCMAKE_CXX_LINK_EXECUTABLE='echo not linking now...'"
     OUTPUT_VARIABLE OUTPUT)
+
+if (NOT DEFINED WITH_KERBEROS)
+    SET(WITH_KERBEROS false)
+    MESSAGE(STATUS "libhdfs3 will be build without kerberos support")
+endif()
