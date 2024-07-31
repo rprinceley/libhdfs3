@@ -28,6 +28,8 @@
 #ifndef _HDFS_LIBHDFS3_SERVER_DATANODE_H_
 #define _HDFS_LIBHDFS3_SERVER_DATANODE_H_
 
+#include <cstdint>
+
 #include "BlockLocalPathInfo.h"
 #include "client/Token.h"
 #include "ExtendedBlock.h"

@@ -34,6 +34,7 @@
 #include <string>
 #include <sstream>
 #include <limits>
+#include <cstdint>
 
 #include "Exception.h"
 #include "ExceptionInternal.h"
