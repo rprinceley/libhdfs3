@@ -96,7 +96,7 @@ ENDIF(NEED_GCCEH)
 
 IF(OS_LINUX)
     TARGET_LINK_LIBRARIES(libhdfs3-static PkgConfig::uuid)
-    TARGET_LINK_LIBRARIES(libhdfs3-shared PkgConfig::uuid)
+    TARGET_LINK_LIBRARIES(libhdfs3-shared PRIVATE PkgConfig::uuid)
 ENDIF(OS_LINUX)
 
 INCLUDE_DIRECTORIES(${libhdfs3_ROOT_SOURCES_DIR})
@@ -123,7 +123,7 @@ ELSE()
 TARGET_LINK_LIBRARIES(libhdfs3-static ${GSASL_STATIC_LIBRARIES})
 ENDIF()
 
-TARGET_LINK_LIBRARIES(libhdfs3-shared protobuf::libprotobuf)
+TARGET_LINK_LIBRARIES(libhdfs3-shared PRIVATE protobuf::libprotobuf)
 TARGET_LINK_LIBRARIES(libhdfs3-shared libxml2::libxml2)
 
 IF (WITH_KERBEROS)
